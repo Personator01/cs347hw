@@ -48,6 +48,56 @@
 
 \begin{document}
 
-% STUDENT: Your text goes here!
+
+\section{}
+\subsection*{a.}
+The proof's error is in the inductive step, specifically, the statements "Note that $(n+1)^2 + 1 = n^2 + 1 + 2n + 1$. So adding the $(n+1)$st line creates $2n+1$ new regions". This statement assumes that $(n+1)^2 + 1$ is the number of regions after adding the $n+1$th line, without proving it. That is, the proof assumes $P(n+1)$ without proving it from $P(n)$.  
+
+\subsection*{b.}
+\textbf{Proof: } by induction on $n$. \\ 
+Case $n = 1$: \\ 
+For one line, the plane is divided into two sections. $(1^2 + 1 + 2)/ 2 = 4 / 2 = 2$, so $P(1)$ is true. \\ 
+Inductive case: \\ 
+By the inductive hypothesis, $P(n)$ is true, so $n$ lines divide the plane into $(n^2 + n + 2)/2$ regions. \\ 
+As no two lines are parallel, and no three can pass through a single point, the $(n+1)$th line must intersect all the other lines. \\
+
+\section{}
+\subsection*{a.}
+Let $P$ be the proposition that a tree with $n$ nodes has $n - 1$ edges. \\ 
+\textbf{Proof:} by induction on $n$. \\ 
+Case $n = 1$: When the tree consists of a single node, there are no edges, so $m = 0 = n - 1$. Thus $P(1)$ is true. \\ 
+
+Inductive case: \\ 
+By the inductive hypothesis, $P(n)$ is true, so the number of edges in the tree of size $n$ is one less than $n$. Since the tree with $n+1$ nodes has one more node than the tree with $n$ nodes, it must necessarily also have one additional edge, that is, the one which connects $n$ to its parent. This must be the only additional edge, as if any other edge connecting the $n+1$th node to an existing node other than its parent were introduced, due to the fact that the other node is also connected to the root via its parents, a cycle would form and the binary tree would cease to be a tree. Thus the tree with $n+1$ nodes has one more edge than the tree with $n$ nodes. SInce the tree with $n$ nodes had $n-1$ edges, the tree with $n+1$ nodes has $n$ edges, and therefore $P(n+1)$ is true.
+
+Since $P(1)$ is true and $\forall n \geq 1,\  P(n) \implies P(n+1)$, all rooted binary trees have one less edge than they do nodes.
+
+\subsection*{b.}
+\textbf{Lemma: } Any full binary tree 
+
+
+\section{}
+We must establish conditions under which a line separates points of different color. We will imagine that there exists a line segment between each pair of points. 
+Consider all the line segments between points of the same color. Any line which separates the points by color must not intersect any of these line segments, as if it did, it would necessarily place points of the same color on opposite sides of the line. Now consider all the line segments between points of opposing colors. A line which separates the points by color must intersect each of these line segments, as otherwise it would place points of opposing color on the same side. Therefore any line which separates the points by color must
+\begin{enumerate}
+    \item Not intersect with any line segment between points of the same color
+    \item Intersect with every line segments between points of different color
+\end{enumerate}
+
+The configurations of points can be characterized into two groups, those in which three or more points are on a line, and those in which no three points are on a line.
+The configurations in which three or more points are on a line can further be separated into those configurations such that all four points are on a line, and those in which three points are on a line and the other is not. 
+The configurations in which no three points are on a line can be separated into those configurations in which the four points form a convex quadrilateral, and configurations in which the four points form a concave quadrilateral. \\ 
+Thus we will consider four possible cases: 
+\begin{enumerate}
+    \item The points are arranged such that all four are on a line. 
+    \item The points are arranged such that three points are on a line, while the other is not. 
+    \item The points are arranged to form a convex quadrilateral. 
+    \item The points are arranged to form a concave quadrilateral.  
+\end{enumerate}
+
+
+Case 1:
+
+
 
 \end{document}
