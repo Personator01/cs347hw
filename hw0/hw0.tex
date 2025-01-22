@@ -85,18 +85,23 @@ Consider all the line segments between points of the same color. Any line which 
 \end{enumerate}
 
 The configurations of points can be characterized into two groups, those in which three or more points are on a line, and those in which no three points are on a line.
-The configurations in which three or more points are on a line can further be separated into those configurations such that all four points are on a line, and those in which three points are on a line and the other is not. 
 The configurations in which no three points are on a line can be separated into those configurations in which the four points form a convex quadrilateral, and configurations in which the four points form a concave quadrilateral. \\ 
-Thus we will consider four possible cases: 
+Thus we will consider three possible cases: 
 \begin{enumerate}
-    \item The points are arranged such that all four are on a line. 
-    \item The points are arranged such that three points are on a line, while the other is not. 
+    \item The points are arranged such that at least three points are on one line. 
     \item The points are arranged to form a convex quadrilateral. 
     \item The points are arranged to form a concave quadrilateral.  
 \end{enumerate}
 
 
-Case 1:
+\textbf{Case 1:} \\ 
+We will consider the three points on a line. Whether or not the fourth point is on the line is irrelevant, and we will ignore it. We will number the three points on the line 1, 2, and 3, such that they are in order as one moves along the line. Mark points 1 and 3 red, and mark point 2 blue. Now consider the line segments between the points. There exists a line segment between matching-color points 1 and 3, which passes through point 2. There also exists a line segment between different-color points 1 and 2, which is entirely contained within the line segment between 1 and 3. As stated previously, any line which separates all different-color points must intersect every line segment between different-color points, while not intersecting any line segment between same-color points. Therefore this line would need to intersect the line between 1 and 2 without intersecting the line between 1 and 3. This is not possible, as every point on the line segment between 1 and 2 is also on the line segment between 1 and 3. Therefore for any configuration in which three points are on a line, we can color them so that there exist no line which separates them by color. \\ 
+
+\textbf{Case 2:} \\ 
+If the points form a convex quadrilateral, color the points so that opposite corners of the quadrilateral have the same color. 
+
+\textbf{Case 3:} \\ 
+We can consider a concave quadrilateral instead as a triangle of three points, with another point inside of the triangle. Color the points of the triangle red, and the interior point blue. Consider the line segments between the points. The interior point is connected to each vertex of the triangle, which are entirely within the triangle. The sides of the triangle are the line segments between the red vertices. A line which separates the color must intersect the line segments between the point and the vertices without intersecting the sides of the triangle. This is impossible, because the interior line segments are entirely within the triangle, so a line intersecting them must necessarily intersect with the sides of the triangle.
 
 
 
