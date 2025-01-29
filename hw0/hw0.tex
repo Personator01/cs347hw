@@ -73,7 +73,14 @@ By the inductive hypothesis, $P(n)$ is true, so the number of edges in the tree 
 Since $P(1)$ is true and $\forall n \geq 1,\  P(n) \implies P(n+1)$, all rooted binary trees have one less edge than they do nodes.
 
 \subsection*{b.}
-\textbf{Lemma: } Any full binary tree 
+Let $P(n)$ be the proposition that a full binary tree with $n$ nodes has one more leaf than it has internal nodes. \\ 
+Any full binary tree must necessarily have an odd number of nodes, as otherwise an internal node would have one leaf. Therefore we only need to prove that $P(n) \implies P(n + 2)$ after proving $P(1)$, as this encompasses all positive odd values of $n$. \\ 
+Base case: n = 1 \\ 
+A tree with one node consists of a single leaf and no internal nodes.\\ 
+Inductive case:
+By the inductive hypothesis, $P(n)$ is true, so the full binary tree with $n$ nodes has one more leaf than it has internal nodes. In order to create a full binary tree with $n + 2$ nodes, we must add two nodes to a full binary tree with $n$ nodes. These two nodes must necessarily have the same parent, and that parent must be a leaf, as otherwise the new binary tree would have a node with one child, thus no longer being full. When adding the two leaves, the new binary tree gains two more leaves, but the node that is now the parent of the new nodes ceases to be a leaf, and instead becomes an internal node. Therefore, the new binary tree gains two more leaves, loses one leaf, and gains one internal node, afterwards having one more leaf and one more internal node than it had before. Since it had one more leaf than internal nodes before, adding one of each results in the new tree also  haing one more leaf than internal nodes. Thus $P(n)$ implies $P(n+2)$. \\ 
+
+Therefore, by induction, any full binary tree must have one more leaf than it has internal nodes. \\
 
 
 \section{}
@@ -98,11 +105,24 @@ Thus we will consider three possible cases:
 We will consider the three points on a line. Whether or not the fourth point is on the line is irrelevant, and we will ignore it. We will number the three points on the line 1, 2, and 3, such that they are in order as one moves along the line. Mark points 1 and 3 red, and mark point 2 blue. Now consider the line segments between the points. There exists a line segment between matching-color points 1 and 3, which passes through point 2. There also exists a line segment between different-color points 1 and 2, which is entirely contained within the line segment between 1 and 3. As stated previously, any line which separates all different-color points must intersect every line segment between different-color points, while not intersecting any line segment between same-color points. Therefore this line would need to intersect the line between 1 and 2 without intersecting the line between 1 and 3. This is not possible, as every point on the line segment between 1 and 2 is also on the line segment between 1 and 3. Therefore for any configuration in which three points are on a line, we can color them so that there exist no line which separates them by color. \\ 
 
 \textbf{Case 2:} \\ 
-If the points form a convex quadrilateral, color the points so that opposite corners of the quadrilateral have the same color. 
+If the points form a convex quadrilateral, color the points so that opposite corners of the quadrilateral have the same color. Consider the line segments between the points. The diagonals of the quadrilateral will be the segments between points of the same color, and the sides of the quadrilateral will be between points of different color. A line which separates all points of different color would need to intersect all sides of the quadrilateral without intersecting the diagonals. This is impossible, because any line which passes through the interior of the quadrilateral, which would be necessary in order to intersect the sides, would intersect one or both diagonals.
 
 \textbf{Case 3:} \\ 
 We can consider a concave quadrilateral instead as a triangle of three points, with another point inside of the triangle. Color the points of the triangle red, and the interior point blue. Consider the line segments between the points. The interior point is connected to each vertex of the triangle, which are entirely within the triangle. The sides of the triangle are the line segments between the red vertices. A line which separates the color must intersect the line segments between the point and the vertices without intersecting the sides of the triangle. This is impossible, because the interior line segments are entirely within the triangle, so a line intersecting them must necessarily intersect with the sides of the triangle.
 
+Therefore for any possible configuration of the four points, there exists a coloring for which there cannot exist a line which separates different-color points.
+
+\section{}
+\subsection*{a.}
+$\log_4(3) < 1$, so case 3 applies. The regularity condition is $3f(n/4) = 3(n/4)\log(n/4) = (3/4)n\log(n/4) \leq (3/4)n\log(n/4) = (3/4)f(n)$, which is true. Therefore the nonrecursive term dominates, so $T \in \Theta(n\log(n))$. 
+\subsection*{b.}
+$\log_2(5) \approx 2.322$. $n^2\log(n) \in O(n^{\log_2(5)})$, so the first case applies, so $T \in O(n^{\log_2(5)})$.
+\subsection*{c.}
+$\log_2(4) = 2$. $n^2$ is smaller than $n^2\log(n)$, but only by a factor of $\log(n)$, so case 3 does not apply. However, since the difference is logarithmic, we can use the rule that states that the recurrence is given an additional log. Since $f \in \Theta(n^2\log(n))$, $T \in \Theta(n^2\log^2(n))$.
+\subsection*{d.}
+$\log_4(1) = 0$. $0 \in O(\log(n))$, but not by a polynomial factor, so case 3 does not apply. However, we can see that each successive recurrence has one fourth the input size, so the work done will take the form $T(n) = \log(n) + \log(\frac{n}{4}) + \log(\frac{n}{16}) + ... + 1$. The first log factor will dominate, so $T(n) \in O(\log(n))$. \\ 
+\subsection*{e.}
+The master theorem does not apply, but the problem size decreases by 1 for each recursion, so there will be $n$ total recursions. The total work done will take the form $\log(n) + \log(n-1) + ... \log(1) = \sum_{i=1}^n\log(i) = \log(\prod_{i=1}^n) = \log(n!)$. Therefore the asymptotic complexity is $T \in O(\log(n!))$.
 
 
 \end{document}

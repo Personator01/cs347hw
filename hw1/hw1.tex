@@ -1,0 +1,178 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\iffalse
+\usepackage[bookmarks=false]{hyperref} % for URL embedding
+\fi
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+\NewCommandCopy{\getss}{\gets}
+\renewcommand{\gets}{$\getss$}
+
+\section{}
+\subsection*{a.}
+This algorithm will minimize change. 
+\textbf{Proof: } \\ 
+
+\textbf{Greedy Choice: }\\ 
+First, we will show that any optimal solution will include the first step of assigning an article to the slot which is most similar to it in length, that is, that minimizes the difference between article and slot length. \\ 
+Suppose an optimal solution $\Pi^*$ assigns the first article to a slot other than that which minimizes the change needed. Let $a$ and $s$ be the first article and the slot most similar to it in length, and let $l$ and $m$ be their respective length, let $a^*$ and $l^*$ be the article which is assigned to $s$ in solution $\Pi^*$ and its length, and let $s^*$ and $m^*$ be the slot to which $a$ is assigned in solution $\Pi^*$ and its length. The change needed from these two slot-article pairs is $|l-m^*| + |l^*-m|$. Now consider the solution $\Pi$ which instead takes the greedy step and assigns $a$ to $s$, and $a^*$ to $s^*$. The total change needed from these two slot-article pairs is $|l - m| + |l^*-m^*|$. Because $|l - m|$ is guaranteed to be minimal, it must be less than $|l - m^*|$. Therefore any such optimal solution must contain the greedy choice of assigning $a$ to $s$.  
+
+\textbf{Inductive Structure: }\\ 
+Next, we show that taking the greedy step will yield a subproblem which is similar to the original problem. Given $n$ articles and slots, taking the greedy step will eliminate one of each, by assigning an article to a slot, that is, a solution $\Pi'$ to the subproblem after the first step will contain $n-1$ assigned slots and articles, leaving, which can be combined with the assigned slot and article from the first step to yield a solution to the problem.  
+
+\textbf{Optimal Substructure: }\\ 
+Finally, we show that taking the greedy step will yield an optimal solution. Let $P$ be the original problem, $P'$ be the subproblem after taking greedy step and assigning article $a_i$ to slot $s_j$, and $\Pi'$ is an optimal solution to $P'$. We will show that $\Pi = \Pi' + {(a_i, s_j)}$ is an optimal solution. The optimal solution $\Pi'$ will have some minimal total change required $c$. The greedy step will have some minimal change required $|l_i - m_j|$. Therefore the total change required by the solution can be expressed as $(|l_i - m_j|) + c$, the two terms coming from the first step and the optimal solution to the subproblem. Therefore by the standard contradiction argument, the problem must have optimal substructure.
+
+Now, we can show that the algorithm works for all problem sizes.
+
+By induction on $n$:  
+
+Base case: For $n=1$, there is exactly one article and one slot. The greedy choice will assign the article to the slot, incurring a necessary change equal to the difference in length between the article and the slot. Since there exist no other feasible solutions, there exist no other solutions with less needed change, and therefore the solution which takes the greedy choice is optimal. 
+
+Inductive case: Let $P$ be the problem of size $n$, and let $\hat{c}$ be the greedy choice made for $P$. As shown above, taking the greedy step will yield a subproblem $P'$ which with size $n-1$. By the inductive hypothesis, there exists optimal solution $\Pi'$ for $P'$. Since the algorithm has an optimal first step, inductive structure, and optimal substructure, combining $\hat{c}$ with $\Pi'$ will yield a solution $\Pi$ to $P$ which is feasible and optimal. 
+
+Since the algorithm is optimal for problem size $1$, and optimality for problem size $n$ implies optimality for problem size $n+1$, the problem is optimal for all problem sizes. \\ 
+
+
+\section{}
+\subsection*{a.}
+The algorithm will proceed from the top to the bottom of the chain. Given the set of acrobats, any feasible choice will have a strength greater than or equal to the weight of all the acrobats. Therefore our greedy choice will be to pick any acrobat which has a strength greater than or equal to the total weight of all the acrobats. If no such acrobat exists, then no feasible solution exists, as no acrobat will be able to support their own weight plus the weight of the other acrobats. A greedy algorithm which uses this choice will find a feasible solution if it exists. \\ 
+
+\textbf{Proof: }
+
+\textbf{Greedy Choice: }
+
+First, we will show that any feasible solution will contain the greedy choice. Consider a solution which does not take the greedy choice, that is, it chooses for the uppermost acrobat an acrobat with strength less than the sum weight of all the acrobats. In order for a solution to be feasible, each acrobat must have enough strength to support their own weight plus the weight of the chain below them. Since the weight of the chain below them consists of all the other acrobats, its weight plus the weight of the first acrobat is equal to the sum weight of all the acrobats. Since the first acrobat has strength less than this sum weight, this is not a feasible solution. Thus any feasible solution to the problem will include the greedy choice. 
+
+
+\textbf{Inductive Structure: }
+Next, we will show that taking the greedy choice leaves a smaller subproblem with the same structure. After taking the greedy choice, we are left with $n-1$ acrobats. By the definition of the greedy choice, we know that the previously-selected acrobat can hold any chain of the other acrobats, so they act the same as the brass ring in the original problem. Therefore we can apply the same algorithm to find a feasible chain of length $n-1$, and, since we know that any chain created from the $n-1$ acrobats can be supported by the first, we can combine these solutions to yield a feasible solution to the original problem.
+
+Now, by induction on $n$: 
+
+Base case: For $n=1$, there is one acrobat with weight $w$ and strength $s$. A feasible solution exists if $s \geq w$. If $s \geq w$, the greedy choice will identify that the acrobat has enough strength to hold all the acrobats (in this case, themself), and will choose the singular acrobat, which is a feasible solution. If $s < w$, the greedy choice will fail to find an acrobat with strength greater than that of the sum weight of the acrobats, as no feasible solution exists. Therefore for $n=1$ the algorithm will find a feasible solution iff there exists a feasible solution.
+
+Inductive case: Let $P$ be the problem of size $n$, and $\hat{c}$ be the greedy choice taken for $P$ (if it exists). As shown above, this will yield a subproblem $P'$ of size $n-1$. By the inductive hypothesis there exists a feasible solution $\Pi'$ to $P'$ given by applying the greedy algorithm to $P'$. Because a feasible solution must make choice $\hat{c}$ by the Greedy Choice property, and a greedy choice can be combined with a feasible subsolution to yield a feasible solution by the Inductive Structure Property, combining $\hat{c}$ with $\Pi'$ will yield a feasible solution if it exists to $P$. 
+
+Since the algorithm can find a feasible solution if it exist for size $n=1$, and can find a feasible solution if it exists for size $n$ if it can find a feasible solution if it exists for size $n-1$, the algorithm can find a feasible solution if it exists for all problem sizes. 
+
+Assume \texttt{sortByStrength} efficiently ($\Theta(n\log n)$) sorts acrobats by strength, descending, and \texttt{sumWeights} efficiently ($\Theta(n)$) computes the sum of the weights of the acrobats.
+
+\textbf{Pseudocode Implementation}
+
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State Solution \gets $[]$
+\State Acrobats \gets sortByStrength(Acrobats) 
+\State TotalWeight \gets sumWeights(Acrobats)
+\For{1..n}
+    \State StrongestAcrobat \gets pop(Acrobats) 
+    \If{StrongestAcrobat.strength $\geq$ TotalWeight}  
+    \Comment{Feasibility condition, since acrobats are sorted by strength, if this check fails, then no acrobats are strong enough}
+        \State TotalWeight \gets TotalWeight - StrongestAcrobat.weight
+        \State push(StrongestAcrobat, Solution) 
+    \Else  
+        \State \Return{None} \Comment{No feasible solution exists}
+    \EndIf
+\EndFor
+\State \Return Solution
+\end{algorithmic}
+\end{algorithm}
+
+Sorting the acrobats by strength takes $\Theta(n\log n)$ time, summing the weights takes $\Theta(n)$ time, and since the loop consists of constant-time operations with $n$ iterations, the entire loop is $\Theta(n)$. Therefore $T \in \Theta(n \log n) + 2\Theta (n) = \Theta(n \log n)$.
+
+\subsection*{b.}
+This problem is nearly identical to the previous one, with the main differences being that it is bottom-to-top, and that an acrobat must be able to support the weight of the acrobats above them. Therefore any feasible choice, given the set of acrobats, will have a strength greater than or equal to the sum weight of all the other acrobats, or equivalently, the sum weight of all the acrobats minus their own weight. Therefore our greedy choice rule will be to pick any acrobat whose strength is greater than or equal to the sum weight of all the acrobats minus their own. 
+
+\textbf{Proof: }
+
+\textbf{Greedy Choice: }
+
+First, we will show that any feasible solution will take the greedy choice of picking an acrobat with strength greater than or equal to the sum weight of the acrobats minus their own weight. Consider a solution which does not take the greedy choice, that is, picks for the base of the tower an acrobat with strength less than the sum weight of all the acrobats minus their own, or equivalently the weight of all the acrobats above them. This would not be a feasible solution, as the base of the tower must be able to support the weight of all of the rest of the acrobats. Therefore any feasible solution takes the greedy choice.
+
+\textbf{Inductive Structure: }
+
+Next, we will show that taking the greedy choice leaves a smaller subproblem with the same structure, and the solution to that subproblem can be combined with the greedy choice. After taking the greedy choice, we are left with $n-1$ acrobats which must be ordered according to the same rules as the original problem. Since we know by the greedy choice that the previously-chosen acrobat is strong enough to support the weight of the remaining $n-1$ acrobats, they effectively act as the floor for this subproblem. Thus the algorithm can attempt to find a feasible solution to this subproblem. If such a feasible solution exists, it can be combined with the greedy choice, as we know that the first acrobat can support all the others.
+
+Now, by induction on problem size $n$. 
+
+Base case: For $n=1$, there is one acrobat with positive weight and strength. Since the acrobat needs not support itself, there is always a feasible solution. The greedy rule will evaluate if the acrobat's strength is greater than or equal to the total weight minus their own weight, which in this case sums to zero, and so the greedy rule will always choose the one acrobat. Therefore for $n=1$ the algorithm will always find a feasible solution.
+
+Inductive case: Let $P$ be the given problem of size $n$, and $\hat{c}$ be the greedy choice taken for $P$. As shown above, this will yield a subproblem $P'$ with size $n-1$. By the inductive hypothesis applying the algorithm to $P'$ yields a feasible solution $\Pi'$ if it exists. Since a feasible solution must make greedy choice $\hat{c}$ by the Greedy Choice property, and a feasible solution to the subproblem can be combined with a greedy choice to yield a feasible solution to the problem, combining $\hat{c}$ with $\Pi'$ will yield a feasible solution to $P$, if it exists. 
+
+Since the algorithm will find a feasible solution for size $n=1$, and can find a feasible solution to size $n$ if it can find a feasible solution to size $n-1$, the algorithm will find a feasible solution if it exists for all problem sizes.
+
+Assume \texttt{sortByStrength} efficiently ($\Theta(n\log n)$) sorts acrobats by strength, descending, and \texttt{sumWeights} efficiently ($\Theta(n)$) computes the sum of the weights of the acrobats.
+\textbf{Pseudocode Implementation}
+
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State Solution \gets $[]$
+\State Acrobats \gets sortByStrength(Acrobats) 
+\State WeightAbove \gets sumWeights(Acrobats)
+\For{1..n}
+    \State StrongestAcrobat \gets pop(Acrobats)
+    \State WeightAbove \gets WeightAbove - StrongestAcrobat.weight 
+    \If{StrongestAcrobat.strength $\geq$ WeightAbove}  
+    \Comment{Feasibility condition, since acrobats are sorted by strength, if this check fails, then no acrobats are strong enough}
+        \State push(StrongestAcrobat, Solution) 
+    \Else  
+        \State \Return None \Comment{No feasible solution exists}
+    \EndIf
+\EndFor
+\State \Return Solution
+\end{algorithmic}
+\end{algorithm}
+
+Sorting the acrobats by strength takes $\Theta(n\log n)$ time, summing the weights takes $\Theta(n)$ time, and since the loop consists of constant-time operations with $n$ iterations, the entire loop is $\Theta(n)$. Therefore $T \in \Theta(n \log n) + 2\Theta (n) = \Theta(n \log n)$.
+
+
+
+
+\end{document}
