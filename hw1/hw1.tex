@@ -79,6 +79,48 @@ Inductive case: Let $P$ be the problem of size $n$, and let $\hat{c}$ be the gre
 
 Since the algorithm is optimal for problem size $1$, and optimality for problem size $n$ implies optimality for problem size $n+1$, the problem is optimal for all problem sizes. \\ 
 
+\subsection*{b.}
+
+
+Our greedy choice rule will be to assign an article with minimal length to the slot with minimal length. 
+
+\textbf{Proof: }
+
+\textbf{Greedy Choice: }
+First, we show that any optimal solution will include a first step which obeys the greedy choice rule. Suppose some optimal solution exists which does not obey the greedy choice property, that is, it assigns to the smallest slot $s_m$ an article longer than the shortest article $a_m$, which we will call $a_o$. Then $a_m$ is assigned to some other slot $s_o$. Consider the solution that follows the greedy rule, that is, that swaps $a_m$ with $a_o$ and assigns $a_m$ to $s_m$ and $a_o$ to $s_o$. 
+
+Since $a_m$ is minimal, swapping it into the minimal slot must produce an optimal solution, as $a_o$ is larger then $a_m$ and $s_o$ is larger than $s_m$, so the appropriately-sized articles will be placed in the appropriately-sized slots. 
+
+\textbf{Inductive structure: }
+Next, we show that taking the greedy step will yield a subproblem which is similar to the original problem. Given $n$ articles and slots, taking the greedy step will eliminate one of each, by assigning an article to a slot, that is, a solution $\Pi'$ to the subproblem after the first step will contain $n-1$ assigned slots and articles, leaving, which can be combined with the assigned slot and article from the first step to yield a solution to the problem.  
+
+\textbf{Optimal Substructure: }\\ 
+Finally, we show that taking the greedy step will yield an optimal solution. Let $P$ be the original problem, $P'$ be the subproblem after taking greedy step and assigning minimal article $a_i$ to minimal slot $s_j$, and $\Pi'$ is an optimal solution to $P'$. We will show that $\Pi = \Pi' + {(a_i, s_j)}$ is an optimal solution. The optimal solution $\Pi'$ will have some minimal total change required $c$. The greedy step will have some minimal change required $|l_i - m_j|$. Therefore the total change required by the solution can be expressed as $(|l_i - m_j|) + c$, the two terms coming from the first step and the optimal solution to the subproblem. Therefore by the standard contradiction argument, the problem must have optimal substructure.
+
+In the base case, there is exactly one article and one slot, and there is exactly one solution, to assign the article to the slot. In this case, the greedy choice will assign the one article to the slot, so it will find a feasible and optimal solution. \\ 
+
+Since the problem has an optimal greedy choice, inductive structure, and optimal substructure, as well as an optimal base case, we can show by induction on problem size $n$ that the algorithm will find an optimal solution for all problem sizes.
+
+\textbf{Pseudocode Implementation: }
+
+We will assume that getIndices converts a list of sizes to a list of tuples of form: (original index, size) whose elements can be accessed by the Index and Size functions, efficiently ($\Theta(n)$), and that sortBySize sorts an array of this form by the article sizes efficiently ($\Theta(n\log n)$). The solution will consist of a list of size $n$ whose indices are the slots and whose values are the original indices of the articles, such that if the i-th element of the solution array is j, the article $a_j$ is assigned to slot $s_i$.
+\begin{algorithmic}
+\State AssignArticles(articleSizes, slotSizes, n)
+\State solution \gets $[n]$
+\State articleSizesSorted \gets sortBySize(getIndices(articleSizes))  \Comment Linear plus n log n = n log n
+\State slotSizesSorted \gets sortBySize(getIndices(slotSizes))
+\While{articleSizesSorted is nonempty}
+\Comment Pops one each loop, so runs $n$ times.
+    \State smallestArticle \gets pop(articleSizesSorted)
+    \State smallestSlot \gets pop(slotSizesSorted)
+    \State Solution[Index(smallestSlot)] = Index(SmallestArticle)
+\EndWhile
+\State \Return solution
+\end{algorithmic}
+
+The two sorts take $\Theta(n \log n)$ time, whereas the loop which runs once for each $n$ contains only constant time operations, so it is $\Theta(n)$. Therefore the time complexity of the entire algorithm is $T \in 2\Theta(n \log n) + \Theta(n) = \Theta(n \log n)$.
+
+
 
 \section{}
 \subsection*{a.}
