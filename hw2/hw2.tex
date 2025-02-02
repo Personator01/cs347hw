@@ -1,0 +1,153 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage[bookmarks=false]{hyperref} % for URL embedding
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{}
+For this question, we will assume $Probe$ is a function $Probe: Class \times \mathbb{N} \rightarrow \mathbb{R}$
+
+We want to find $a$ such that $n$ students across $X$ and $Y$ have anxiety less than $a$.
+
+Suppose we have $a = Probe(X, b)$. Then there are $b$ students in $X$ with anxiety level less than $a$. Suppose we also have $c = Probe(Y, d)$. Then we have $d$ students in $Y$ with anxiety level less than $c$. Now, instead, suppose we had $a = Probe(Y, d) = Probe(X, b)$. Then we have $b+d$ students in $X$ and $Y$ with anxiety less than $a$. If $b+d = n$, then this value $a$ is the median anxiety across both classes. Therefore, in order to find the median, we must find $k \in [0, n]$ such that $Probe(X, k) = Probe(Y, n-k)$. 
+
+However, since these are continuous values and no two students have the same anxiety level, there most likely exists no $k$ such that the probes will be exactly equal. Instead, we must find the value $k$ such that the absolute value difference between the two probes is minimized. We can show that such a minimum exists and that it respresents the median. Suppose we had $k$ such that $Probe(X, k) = a_1$ and $Probe(Y, n-k) = a_2$, such that $|a_1 - a_2|$ is minimized, and suppose, without loss of generality, that $a_1 \geq a_2$. Then there are $k$ students in $X$ with anxiety less than $a_1$ and $n-k$ students in $Y$ with anxiety less than $a_2$. 
+
+\textbf{Claim: } There is exactly one student in $X$ with anxiety between $a_2$ and $a_1$. 
+
+Suppose there exists another student in $X$ with anxiety between $a_2$ and $a_1$. Keep in mind that we have chosen $a_1$ and $a_2$ so that the difference between them is minimized and so that they correspond to the $k$-th and $(n-k)$-th students in $X$ and $Y$
+\textbf{Claim: } An anxiety level $a$ for which there are exactly $n$ students with anxiety less than $a$ must be within the range will exist within the range $[a_2, a_1]$.
+
+
+
+\textbf{Claim: } There are $n-k$ students in $Y$ with anxiety less than $a_1$, and thus, there are $n$ students in $X$ and $Y$ with less than $a_1$
+
+Suppose this claim were not true. That is, there is some number $q \neq n-k$ of students in $Y$ with anxiety level lower than $a_1$. The case in which $q < n-k$ is obviousl false, as there are $n-k$ students in $Y$ with anxiety lower than $a_2$, and $a_1 \geq a_2$, the number of students with anxiety less than $a_1$ cannot be less than the number of students with anxiety less than $a_2$, as every student with anxiety $< a_2$ also has anxiety $< a_1$. Therefore $q$ cannot be less than $n-k$. 
+
+Now consider the case where $q > n-k$. This would mean that there are $n-k$ students in $Y$ with anxiety $< a_2$, and $q$ students with anxiety $< a_1$, and thus $q - (n - k)$ students with anxiety between $a_2$ and $a_1$.   
+
+
+\textbf{Claim: } There exists exactly one such minimum.
+
+\section{}
+\subsection*{a.}
+For a given square of tubes bounded by nodes $(i, j)$ and $(i+n, j+n)$, we can determine if it contains a leak by summing the inputs: $I = \sum_{k=j}^{j+n} f(t^{\rightarrow}_{i-1,k}) + \sum_{k=i}^{i+n} f(t^{\uparrow}_{k,j-1})$, and comparing against the sum of the outputs: $O = \sum_{k=j}^{j+n} f(t^{\rightarrow}_{i+n,k}) + \sum_{k=i}^{i+n} f(t^{\uparrow}_{k, j+n})$. If $O < I$, there is a leak somewhere within this square.
+
+Then, we can define an algorithm to find leaks as so:
+
+With $(i, j)$ being the lower left corner of the square with side length $n$ , and with $n$ guaranteed to be a power of 2,
+\begin{algorithmic}
+    \State OutputMinusInput(i, j, n)
+        \State $I \gets 0$
+        \State $O \gets 0$
+        \For{$k$ in $i..i+n$}
+            \State $I \gets I + f(t^{\uparrow}_{k, j-1})$
+        \EndFor
+        \For{$k$ in $j..j+n$}
+            \State $I \gets I + f(t^{\uparrow}_{i-1, k})$
+        \EndFor
+        \For{$k$ in $i..i+n$}
+            \State $O \gets O + f(t^{\uparrow}_{k, j+n})$
+        \EndFor
+        \For{$k$ in $j..j+n$}
+            \State $O \gets O + f(t^{\uparrow}_{i+n, k})$
+        \EndFor
+        \State \Return $O - I$
+    \State FindLeaks(i, j, n):
+        \If{n = 1} \Comment{Base case: found the leak}
+            \State \Return $(i, j)$
+        \Else
+            \State NewN $\gets \frac{n}{2}$
+            \If{OutputMinusInput$(i+NewN, j+NewN, NewN)$} \Comment{Quadrant 1}
+                \State \Return FindLeaks$(i + NewN, j + NewN, NewN)$
+            \ElsIf{OutputMinusInput$(i+NewN, j, NewN)$} \Comment{Quadrant 2}
+                \State \Return FindLeaks$(i + NewN, j, NewN)$
+            \ElsIf{OutputMinusInput$(i, j, NewN)$} \Comment{Quadrant 3}
+                \State \Return FindLeaks$(i, j, NewN)$
+            \ElsIf{OutputMinusInput$(i, j+NewN, NewN)$} \Comment{Quadrant 4}
+                \State \Return FindLeaks$(i, j + NewN, NewN)$
+            \EndIf
+        \EndIf
+\end{algorithmic}
+
+Since OutputMinusInput measures each element of the perimeter of the square, it takes exactly $4n$ measurements.
+
+
+Since each recursion divides the problem size in half by either halving the width or the height off the rectangle, the time complexity of the algorithm is expressed as the recurrence $T(n) = T(\frac{n}{4}) + 4n$. We can then use the master theorem to find the overall complexity. The regularity condition holds if $4\frac{n}{4} \leq k4n$ for some $k < 1$. If we let $k = \frac{1}{4}$, this inequality simplifies to $n \leq n$, which holds for all $n$, so by the master theorem, the overall complexity is $T(n) \in \Theta(n)$.
+
+This algorithm is correct, and will find the leak, for any problem size $n$ which is a power of 2.
+
+\textbf{Proof: } By recursion on $n$, over the powers of 2. 
+
+Base case: 
+Suppose $n = 1$. The algorithm will recognize that this is the position of the leak and return the appropriate coordinates.
+
+Inductive case:
+Suppose $n$ is a power of 2. The algorithm will divide the total network into four squares. Since both the width and height are powers of two, this will exactly divide the network into quadrants, with each quadrant having a side length of $\frac{n}{2}$. The algorithm will identify which of these quadrants contains a leak, and will then recurse into it. By the inductive hypothesis, the algorithm will find a leak for a problem of size $\frac{n}{2}$.
+
+Since the algorithm is correct for $n=1$, and is correct for $n$ if it is correct for $\frac{n}{2}$, the algorithm is correct for all powers of 2.
+
+
+\subsection*{b.}
+
+For this problem, we will use the same approach as before, with the following adjustments. First, check the entire network. If $O = I$, the network has no leaks and the algorithm is finished. Otherwise, run the algorithm from part A with the following modifications: First, if both halves are found to have a leak, pick one arbitrarily. Second, after finding a leak, mark its location and 'fix' it, by replacing it with a pipe whose ouput is equal to its input, and thus eliminating one leak from the problem. Repeat this extended algorithm until there are no leaks. Since each repetition takes $\Theta(n)$ time and eliminates one leak, the algorithm runs in $\Theta(nk)$ time.
+
+(It would technically be more efficient to recurse down both halves immediately, but not asymptotically faster, and would be harder to analyze)
+
+\textbf{Claim: } The algorithm is correct for any $n$ which is a power of $2$ and any $k \in \mathbb{Nat}$.
+\textbf{Proof: } By recursion on $k$. 
+
+Base case:
+Suppose $k = 0$. Then, the algorithm will immediately find that there are no leaks by checking the input and output of the entire network.
+
+Inductive case:
+Suppose there are $k$ leaks. The algorithm will run the sub-algorithm defined in part a on the entire network. We have proven previously that the subalgorithm is correct and will find a leak for any $n$ which is a power of 2. The algorithm will then eliminate this leak, leaving a problem of size $k-1$. By the inductive hypothesis, the algorithm is correct, and finds all leaks, for size $k-1$. 
+
+Since the algorithm is correct for size $0$, and is correct for size $k$ if it is correct for size $k-1$, it is correct for all $k \in \mathbb{N}$. 
+
+
+\end{document}
