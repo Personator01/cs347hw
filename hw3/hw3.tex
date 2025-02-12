@@ -1,0 +1,132 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{}
+
+
+
+
+\section{}
+
+First, we will devise a basic branching search approach to this problem. Starting from $c_1$, we will iterate over all nodes in the network and choose whether or not to make each one a server. Suppose for problem $\Pi$, we have $k$ servers left to assign and we are currently on the $n$th node. Also, the position of the last server is $p$. We can choose to either make $c_n$ a server, or leave it. (With base cases: if $k = 0$ return an empty solution, and if $|C| - n = k$, return the set of all nodes after $c_n$)
+
+Suppose we choose to make $c_n$ a server. Then we are left with subproblem $\Pi_s'$ with $n_s = n + 1, k_s = k - 1, p_s = n$, which produces some solution $S_s'$. Then, we can evaluate the latency of this choice by taking the sum latency of all the nodes between $c_p$ and $c_0$. This evaluation is independent of any nodes between $s_0$ and $c_p$, as we know that $s_0$ and $c_p$ are servers, so any node between them must be closer to $s_0$ or $c_p$ than they are to any of the newly-added nodes.
+
+If we do not make $c_n$ a server, we are left with the subproblem $\Pi_l$ with $n_l = n + 1, k_l = k, p_s = p$, which produces some solution $S_n'$. We can calculate the latency of this choice by evaluating the sum latency of all the nodes between $c_p$ and $s_0$.
+
+If choosing to make $c_n$ a server yields lower latency than not, we return the solution $S = S_s' \union \{c_n\}$, and if not, we return the solution $S_n'$.
+
+\subsection*{Complete Choice}
+Since, for any node $c$, all solutions will either make it a server or not make it a server, this algorithm will evaluate all possible solutions, and thus has the complete choice property.
+
+\subsection*{Inductive Structure}
+For either choice made, the resulting subproblem will have one less node to evaluate, as they both start one node further in the network, and we showed previously that the solution from a subproblem can be combined with the relevant choice, so the problem has inductive structure.
+
+\subsection*{Optimal Substructure}
+
+Suppose we have problem $\Pi$ with solution $S$, and we chose to make $c_n$ a server, yielding subproblem $\Pi_s'$ with optimal solution $S_s'$. As we established before, the latency of any solution to $\Pi$ is unaffected by any of the nodes between $s_0$ and $c_p$, so it can be characterized solely by the sum latency of the nodes from $c_p$ to $s_0$. By the same argument, the sum of any solution to $\Pi_s'$ can be characterized solely by the sum latency of the nodes from $c_n$ to $c_0$. Therefore we can express $L(S) = \Sigma (L(c_p ... c_n)) + \Sigma (L(c_n ... s_0)) = \Sigma(L(c_p)) + L(S_s')$ (Since $c_n$ is a server, $L(c_n) = 0$). 
+
+Now suppose there exists a more optimal solution to $\Pi$, $S^*$ which makes $c_n$ a server. Since it solves the same subproblem, there exists some $S_s^*$ which is not $S_s'$, and since $S^*$ is more optimal than $S$, $L(S^*) = \Sigma (L(c_p ... c_n)) + L(S_s^*) < \Sigma(L(c_p ... c_n)) + L(S_s')$. However, since $S_s'$ is optimal, $L(S_s^*) < L(S_s')$ is a contradiction, so the assumption that there exists a solution more optimal than $S$ must be false.
+
+Suppose we have problem $\Pi$ with solution $S$, and we chose to not make $c_n$ a server, yielding subproblem $\Pi_s'$ with optimal solution $S_s'$. Since $p_s = p$ for the subproblem, the solution to the subproblem will have the exact same latency as $S$, so we can express $L(S) = L(S_s') = \Sigma(L(c_p ... s_0))$. Suppose there exists a solution $S^*$ which is more optimal than $S$, that is, $L(S^*) < L(S)$, which also chooses not to make $c_n$ a server. This implies the existence of a solution $S_s^*$ to $\Pi_s'$ other than $S_s'$. Once again, since $p_s = p$, it will have the same latency as $S$, so $L(S^*) < L(S) \implies L(S_s^*) < L(S_s')$. Since $S_s'$ waas optimal, this is a contradiction, so our assumption that there exists a more optimal solution than $S$ must be false.
+
+The algorithm yields an optimal solution for all problem sizes. 
+
+\textbf{Proof: } by induction on problem size $P$. 
+
+Suppose $P$ = 1. Assuming that the number of servers to assign is also 1, the algorithm recognizes that $n = k$, so it returns the set containing the single node. This is optimal, as it reduces the node's latency to zero.
+
+Suppose $P$ = $q$. After choosing either to make the first node a server or not, the algorithm is left with exactly one subproblem of size $q-1$, as shown by the inductive structure property. By the inductive hypothesis, the algorithm finds an optimal solution for the subproblem.
+
+By the inductive structure and complete choice properties, the subproblem's solution can be combined with the choice to make a feasible solution which is optimal for the choice made.
+
+Since the two choices encompass the entire space of possible choices, one must be optimal, by the complete choice property. $\blacksquare$
+
+
+\subsection*{Recurrence}
+
+For every subproblem there are exactly three parameters. These are $n$, the index of the current node for which a choice will be made, $k$, which is the number of servers left to assign, and $p$, which is the index of the last server.
+
+When the choice is made to make the node a server, the subproblem is given values $n_s = n+1, k_s = k - 1$, and $p_s = n$. When the choice is made to not make the node a server, the subproblem is given values $n_l = n+1, k_l = k$, and $p_l = p$. We will define the value $V[n, k, p]$ as the minimum sum latency of all the nodes between $c_p$ and $s_0$, given that $c_p$ and $s_0$ are both servers. Then our recurrence formula is $V[n, k, p] = \min\{(\sum_{i=p}^n l_i) + V[n+1, k-1, n], V[n+1, k, p]\}$. 
+
+However, this value is not the object of the algorithm, it is simply used to identify the better of alternate solution sets. Therefore our actual values will be sets of indices in $1..|C|$, signifying which nodes are turned into servers. Therefore we define a second value, which are the sets of indices of computers chosen as servers, which we will call $S$. This will be used within the pseudocode.
+
+We want to solve the problem for index $n=1$, $k = K$, and $p = 0$, since this is the initial configuration of the network. 
+
+We can visualize the set of possible values as a three-dimensional space, $|C|$ units tall, $K$ units in width, and $|C|$ units in depth. We will place $n=1, k=K, p=0$ at the top left front corner of the space, and use the up-down axis for $n$, the left-right axis for $k$, and the front-back axis for $p$. Half of this space will be unoccupied, as any space where $p > n$ will be unused.
+
+Our boundary for the initial values is the plane where $k = |C| - n$. We can calculate these immediately, as their solution set will be all nodes from $c_n$ to $c_{|C| - 1}$, and their latency values will be the sum of the latencies from $c_p$ to $c_n$. This is to account for the base case described above, where there are as many nodes remaining as there are servers to be designated, so all the remaining nodes are made into servers. Then, we can start filling in the remaining nodes, in the order described by the following pseudocode:
+
+\pagebreak
+\begin{algorithmic}
+    \For{$n=|C|-1..0$}
+        \For{$p=0..n$}
+            \For{$k=\max\{K, |C|-n-1\}..0$}
+                \State ChoiceServer $\gets (\sum_{i=p}^n l_i) + V[n+1,k-1,n]$
+                \State ChoiceNoServer $\gets V[n+1,k,p]$
+                \If{ChoiceServer $>$ ChoiceNoServer}
+                    \State $V[n,k,p] \gets ChoiceServer$
+                    \State $S[n,k,p] \gets S[n+1, k-1, n] \cup \{n\}$
+                \Else
+                    \State $V[n,k,p] \gets ChoiceNoServer$
+                    \State $S[n,k,p] \gets S[n+1, k, p]$
+                \EndIf
+            \EndFor
+        \EndFor
+    \EndFor
+\end{algorithmic}
+
+As all calculations happen inside of this three-dimensional space with bounds $|C|$, $K$, and $|C|$, and assuming that calculating latencies is $\Theta(|C|^2)$, this algorithm is $\Theta(|C|^4K)$.
+
+
+
+
+
+
+\end{document}
