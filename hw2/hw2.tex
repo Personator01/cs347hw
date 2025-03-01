@@ -8,7 +8,6 @@
 \usepackage{graphicx} % for figures
 \usepackage{amsmath}  % for extended math markup
 \usepackage{amssymb}
-\usepackage[bookmarks=false]{hyperref} % for URL embedding
 \usepackage[noend]{algpseudocode} % for pseudocode
 \usepackage[plain]{algorithm} % float environment for algorithms
 
@@ -53,26 +52,70 @@ For this question, we will assume $Probe$ is a function $Probe: Class \times \ma
 
 We want to find $a$ such that $n$ students across $X$ and $Y$ have anxiety less than $a$.
 
-Suppose we have $a = Probe(X, b)$. Then there are $b$ students in $X$ with anxiety level less than $a$. Suppose we also have $c = Probe(Y, d)$. Then we have $d$ students in $Y$ with anxiety level less than $c$. Now, instead, suppose we had $a = Probe(Y, d) = Probe(X, b)$. Then we have $b+d$ students in $X$ and $Y$ with anxiety less than $a$. If $b+d = n$, then this value $a$ is the median anxiety across both classes. Therefore, in order to find the median, we must find $k \in [0, n]$ such that $Probe(X, k) = Probe(Y, n-k)$. 
-
-However, since these are continuous values and no two students have the same anxiety level, there most likely exists no $k$ such that the probes will be exactly equal. Instead, we must find the value $k$ such that the absolute value difference between the two probes is minimized. We can show that such a minimum exists and that it respresents the median. Suppose we had $k$ such that $Probe(X, k) = a_1$ and $Probe(Y, n-k) = a_2$, such that $|a_1 - a_2|$ is minimized, and suppose, without loss of generality, that $a_1 \geq a_2$. Then there are $k$ students in $X$ with anxiety less than $a_1$ and $n-k$ students in $Y$ with anxiety less than $a_2$. 
-
-\textbf{Claim: } There is exactly one student in $X$ with anxiety between $a_2$ and $a_1$. 
-
-Suppose there exists another student in $X$ with anxiety between $a_2$ and $a_1$. Keep in mind that we have chosen $a_1$ and $a_2$ so that the difference between them is minimized and so that they correspond to the $k$-th and $(n-k)$-th students in $X$ and $Y$
-\textbf{Claim: } An anxiety level $a$ for which there are exactly $n$ students with anxiety less than $a$ must be within the range will exist within the range $[a_2, a_1]$.
+We will constrain our queries to those which could produce a valid median. Since there must be $n$ students below the median, we will choose some $k \in [0,n]$, and use queries $Probe(X, k)$ and $Probe(Y, n-k)$. 
+Suppose we take $a_1 = Probe(X, k), a_2 = Probe(Y, n-k)$. Suppose, without loss of generality, that $a_1 > a_2$. Then $a_1$ is only a valid median value if there is no student in $Y$ with an anxiety level between $a_2$ and $a_1$, as this would mean that there are more than $k + n-k = n$ students with anxiety level $a_1$. We can measure this by taking $Probe(Y, n-k+1)$, and comparing against $a_1$. Since $a_1$ is invalid due to encompassing too many students in $Y$, we know that the correct value for $k$ must be smaller than what we have found, as any larger value for $k$ will increase $a_1$. Therefore our approach for the algorithm will be to binary search on $k$, eliminating half of the problem space until a solution is found.
 
 
+\begin{algorithmic}[H]
+    \State FindMedian$(n)$
+        \Return FindMedianRec$(n, 0, n)$
 
-\textbf{Claim: } There are $n-k$ students in $Y$ with anxiety less than $a_1$, and thus, there are $n$ students in $X$ and $Y$ with less than $a_1$
+    \State FindMedianRec$(n, mink, maxk)$
+        \State $k \gets \frac{mink, maxk}{2}$
+        \State $a_1 \gets $ Probe$(X, k)$
+        \State $a_2 \gets $ Probe$(Y, n-k)$
+        \If{$a_1 = a_2$}
+            \State \Return $a_1$
+        \ElsIf{$a_1 > a_2$}
+            \If{$k = 0$} \Comment{All $X$ above $Y$}
+                \State \Return $a_2$
+            \EndIf
+            \State NextA2 $\gets$ Probe$(Y, n-k+1)$
+            \If{NextA2 $\leq a_1$} \Comment{$a$ is too high, decrease $k$}
+                \If {$mink = k - 1$} \Comment{edge case where $k$ must be minimized}
+                    \State \Return FindMedianRec$(n, mink, mink)$
+                \Else
+                    \State \Return FindMedianRec$(n, mink, k)$
+                \EndIf
+            \Else \Comment{$a_1$ is a valid median}
+                \State \Return $a_1$
+            \EndIf 
+        \Else 
+            \If{$k = n$} \Comment{ All $Y$ above $X$}
+                \State \Return $a_1$
+            \EndIf 
+            \State NextA1 $\gets$ Probe$(X, k+1)$
+            \If{NextA1 $\leq a_2$} \Comment{$a$ is too high, increase $k$}
+                \If{$maxk = k + 1$} \Comment {edge case where $k$ must be maximized}
+                    \State \Return FindMedianRec$(n, maxk, maxk)$
+                \Else 
+                    \State \Return FindMedianRec$(n, k, maxk)$
+                \EndIf
+            \Else \Comment{$a_2$ is a valid median}
+                \State \Return $a_2$
+            \EndIf 
+        \EndIf
+\end{algorithmic}
 
-Suppose this claim were not true. That is, there is some number $q \neq n-k$ of students in $Y$ with anxiety level lower than $a_1$. The case in which $q < n-k$ is obviousl false, as there are $n-k$ students in $Y$ with anxiety lower than $a_2$, and $a_1 \geq a_2$, the number of students with anxiety less than $a_1$ cannot be less than the number of students with anxiety less than $a_2$, as every student with anxiety $< a_2$ also has anxiety $< a_1$. Therefore $q$ cannot be less than $n-k$. 
+For each recursion, this algorithm will probe two to four times, that is, constant, and decreases the possible solutions by half. Therefore, the algorithm recurses $\log n$ times, and does constant probes at each recursion, so the number of probes $P(n)$ is $P(n) \in \Theta(\log n)$.
 
-Now consider the case where $q > n-k$. This would mean that there are $n-k$ students in $Y$ with anxiety $< a_2$, and $q$ students with anxiety $< a_1$, and thus $q - (n - k)$ students with anxiety between $a_2$ and $a_1$.   
+This algorithm is correct for all problem sizes $n$ which are a power of 2. 
+
+\textbf{Proof: } by induction on $n$ where $n$ is a power of 2. 
+
+Base case: 
+Suppose $n=1$. Then there is exactly one student in each class. Suppose the student in $X$ has anxiety level $x$ and the student in $Y$ has anxiety level $y$. Suppose $x > y$. The algorithm will pick $k = 0$. The algorithm will recognize that all of $X$ is greater than $Y$ (via the condition that $k=0$), and will return $y$, which lies between the two students, and thus is the median. 
+Suppose $x < y$. The algorithm will first pick $k=0$. The algorithm will probe for the level of $0$ in $X$, and will get some value less than $x$, and will probe for the level of $1$ in $Y$ and will get $y$. The algorithm will then probe for the next student in in $X$, who has anxiety $x$ which is less than $Y$. Recognizing that there exists a student with anxiety between the two polls, the algorithm will decide to increase $k$. Since the maximum value of $k$ is one greater than $k$, the algorithm will encounter the special case which sets both $maxk$ and $mink$ to $1$. Then, similarly to before, the algorithm will find that all of $Y$ is greater than all of $X$ (via the condition that $k = n$, and will thus return Probe$(X, 1)$, which is the median.
 
 
-\textbf{Claim: } There exists exactly one such minimum.
+Inductive case:
+Given $X$ and $Y$ and a choice $k \in [0..n]$, $a_1 = Probe(X, k), a_2 = Probe(Y, n-k)$ \\ 
+Suppose $a_1 > a_2$. If $k = 0$, then all $X$ are greater than all $Y$ and the algorithm will find that the median is $a_2$, which encompasses all $n$ students of $Y$. Otherwise, if $Probe(Y, n-k+1) > a_1$, there exists no student in $Y$ with anxiety greater than $a_2$ and less than $a_1$, and therefore $a_1$ encompasses exactly $k + n - k = n$ students, and is thus the median. Otherwise, there exists a student with anxiety between $a_1$ and $a_2$, and therefore $a_1$ is too high to be the median, as it encompasses more than $n$ students. The algorithm then will search within the lower half of possible values of $k$, reducing the problem size by half. By the inductive hypothesis, the algorithm is correct for half the problem size, so the algorithm will find the median for the full problem size. 
+This argument is identical for $a_2 > a_1$. 
 
+Since the algorithm finds a median for class size 1, and finds a median for class size $2n$ if it does for class size $n$, it finds a median for all class sizes which are multiples of 2.
+
+\pagebreak
 \section{}
 \subsection*{a.}
 For a given square of tubes bounded by nodes $(i, j)$ and $(i+n, j+n)$, we can determine if it contains a leak by summing the inputs: $I = \sum_{k=j}^{j+n} f(t^{\rightarrow}_{i-1,k}) + \sum_{k=i}^{i+n} f(t^{\uparrow}_{k,j-1})$, and comparing against the sum of the outputs: $O = \sum_{k=j}^{j+n} f(t^{\rightarrow}_{i+n,k}) + \sum_{k=i}^{i+n} f(t^{\uparrow}_{k, j+n})$. If $O < I$, there is a leak somewhere within this square.
@@ -80,7 +123,7 @@ For a given square of tubes bounded by nodes $(i, j)$ and $(i+n, j+n)$, we can d
 Then, we can define an algorithm to find leaks as so:
 
 With $(i, j)$ being the lower left corner of the square with side length $n$ , and with $n$ guaranteed to be a power of 2,
-\begin{algorithmic}
+\begin{algorithmic}[H]
     \State OutputMinusInput(i, j, n)
         \State $I \gets 0$
         \State $O \gets 0$
@@ -137,6 +180,17 @@ Since the algorithm is correct for $n=1$, and is correct for $n$ if it is correc
 For this problem, we will use the same approach as before, with the following adjustments. First, check the entire network. If $O = I$, the network has no leaks and the algorithm is finished. Otherwise, run the algorithm from part A with the following modifications: First, if both halves are found to have a leak, pick one arbitrarily. Second, after finding a leak, mark its location and 'fix' it, by replacing it with a pipe whose ouput is equal to its input, and thus eliminating one leak from the problem. Repeat this extended algorithm until there are no leaks. Since each repetition takes $\Theta(n)$ time and eliminates one leak, the algorithm runs in $\Theta(nk)$ time.
 
 (It would technically be more efficient to recurse down both halves immediately, but not asymptotically faster, and would be harder to analyze)
+
+\begin{algorithmic}[H]
+\State FindAllLeaks(n):
+    \State Leaks $\gets []$
+    \While{OutputMinusInput$(0,0,n) < 0$}
+        \State (LeakX, LeakY) $\gets$ FindLeaks(0,0,n)
+        \State $f(t^{\uparrow}_{LeakX, LeakY}) \gets f(t^{\uparrow}_{LeakX, LeakY-1})$
+        \State $f(t^{\rightarrow}_{LeakX, LeakY}) \gets f(t^{\rightarrow}_{LeakX-1, LeakY})$
+    \EndWhile
+    
+\end{algorithmic}
 
 \textbf{Claim: } The algorithm is correct for any $n$ which is a power of $2$ and any $k \in \mathbb{Nat}$.
 \textbf{Proof: } By recursion on $k$. 
