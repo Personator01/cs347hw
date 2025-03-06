@@ -1,0 +1,112 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[bookmarks=false]{hyperref} % for URL embedding
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{6}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+\newtheorem{thm}{Theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{}
+
+The problem is in NP.
+\begin{proof}
+    Let $l$ be an instance of the problem $M$. A certificate $c$ would be a subset of $P$ of size at most $k$ such that every email in $\mathcal{E}$ contains at least one phrase in $c$. Since $c$ is a subset of $P$, it is upper bounded by the size of $P$, and is thus linear in the problem size.
+
+    Consider the following verifier for certificates which are subsets of $P$ with size at most $k$: \begin{itemize}
+        \item For each $E \in \mathcal{E}$:
+            \begin{itemize}
+                \item For each $w \in c$:
+                    \begin{itemize}
+                        \item Search for $w$ in $E$. If found, continue to the next $w \in c$. If not found, reject $c$.
+                    \end{itemize}
+            \end{itemize}
+        \item As all $E \in \mathcal{E}$ contain a phrase from $c$, $c$ is a certificate which shows $l$ is true.
+    \end{itemize}
+
+    Let $e$ be an upper bound on the size of an email. Then searching through an email is $O(e)$. Iterating through all words in $c$ is $O(c) = O(|P|)$, and iterating through all emails is $O(|E|)$. Therefore the verifier is $O(e|P||E|)$, and is thus polynomial in the problem size (and the certificate size since that is included).
+
+    Since for every true instance of $M$ there exists a certificate polynomial in the size of the problem and a verifier polynomial in the size of the problem, $M$ is in NP.
+\end{proof}
+
+$3SAT$ reduces to $M$.
+\begin{proof}
+    Given an instance of $3SAT$, we will construct a corresponding instance of $M$. 
+
+    Let $l$ be an instance of $3SAT$. It consists of a series of $n$ 3-clauses connected consisting of $m$ variables $P_{SAT}$ by logical AND. 
+
+    The corresponding instance $p$ of $M$ will $k = m$, a spam vocabulary $P$ of size $2m$ consisting of $P_{SAT}$ and its inverses (that is, $x$ and $\lneg x$ are each distinct members of the vocabulary), and $n + m$ emails split into two groups. The $n$ emails correspond to the clauses of the boolean expression: for each 3-clause $l_i \in l$, the corresponding email $E_i \in \mathcal{E}$ will contain exactly the spam phrases in $l_i$ (with a variable and its negation counting as separate phrases). The $m$ other emails represent the constraint that every variable must be given a truth value, and only one of $x$ and $\lneg x$ can be true, while the other must be false. This set of emails will be defined as, for every variable $x$, the email will contain $x$ and $\lneg x$.   
+
+    Since a mapping will need to read every clause exactly once, and read the set of variables exactly once, and will produce exactly one email for every clause and every variable, the mapping will be polynomial in the amount of clauses and variables, and thus the problem size.
+
+    An assignment of variables will correspond to a subset $Q$ of $P$. For each variable $x \in P_{SAT}$, if $x$ is true then the corresponding phrase in $P$ will in $Q$. If $x$ is false then the corresponding phrase $\lneg x$ will be in $Q$. 
+ \\
+ \\ 
+ \\ 
+
+    Suppose we have a certificate $c$ for a true instance $l$ of $3SAT$. The corresponding instance $j$ of $M$ will be true with a certificate derived from $c$. 
+
+    $c$ is a valid assignment of true and false to the variables such that, for each clause, at least one of the variables (after possible negation) is true. The corresponding instance $j$ consists of $m$ emails corresponding to the 3-clauses, and $n$ emails containing each variable phrase and its negation phrase. 
+
+    As established previously, $c$ will map to a subset $Q$ of $P$, and for each variable-negation phrase pair, exactly one of the phrases will be selected. Therefore, for all of the emails of form $x, \lneg x$, one of the phrases will be in $Q$. As such, all of the $m$ emails with two phrases will have a phrase from $Q$.
+
+    Suppose we have a 3-clause in $l$ of form $(x \or y \or z)$ (and suppose that negation has been folded into the the variable such that $x$ and $\lneg x$ would be separate variables with the constraint $x $ xor $ \lneg x$ is true. This is equivalent to having explicit negative values, but simplifies our analysis.). Since $c$ is an assignment of truth values to variables such that the entire CNF expression is true, it must assign at least one of $x$, $y$, or $z$ to be true. Therefore, for the corresponding email in $j$ which has form $x, y, z$, at least one of $z, y,$ and $z$ will be in $Q$, as $x \in Q$ if $x$ is true. As such, all of the $n$ emails with three phrases will contain a phrase from $Q$. 
+
+    Since all emails contain a phrase from $Q$, and the size of $Q = m \leq k$, $Q$ is a certificate verifying that $j$ is a true instance of $D$. \\ \\ \\ 
+
+    Now suppose, for instance $l$ of $3SAT$ with corresponding instance $j$ of $D$, we had a valid $Q$ for $D$. The assignment $c$ corresponding to $Q$ will result in a true expression for $l$. 
+
+    We will first show that, for every variable $x$, $Q$ contains exactly one of $x$ or $\lneg x$. Suppose $Q$ is contained neither $x$ nor $\lneg x$. As established previously, $j$ will contain one email of the form $x, \lneg x$. If $Q$ does not contain $x$ or $\lneg x$, then this email contains no phrases from $Q$. This contradicts our assumption that $Q$ is valid, so $Q$ must contain at least one of $x$ and $\lneg x$. Now suppose $Q$ contained both $x$ and $\lneg x$. Since $Q$ is valid, for all of the $m$ emails of the form $y, \lneg y$, $Q$ must contain at least one phrase from that email. Besides the email $x, \lneg x$, there are $m-1$ emails of this form corresponding to the other variables, so since the phrase pairs contained in each of these emails is distinct, $Q$ must contain at least $m - 1$ additional phrases. This would make the size of $Q$ $2 + m-1 = m+1$. This contradicts our assumption that $Q$ is valid, as any valid $Q$ must have $|Q| \leq k = m$. Therefore $Q$ must contain at most one of $x, \lneg x$. As such, for every variable $x$, $Q$ contains exactly one of $x$ and $\lneg x$. 
+
+
+\end{proof}
+
+
+
+
+
+\end{document}
