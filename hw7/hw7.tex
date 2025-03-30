@@ -1,0 +1,146 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{7}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{}
+The canonical decision problem $D$ for this is "Is there a selection of at least $k$ jobs such that none contain overlapping time blocks?". 
+
+\subsection*{This problem is in NP}
+
+A certificate would be a list of jobs (indices of jobs) of at least length $k$. The list would be at most length $m$, so would be polynomial in the problem size. A verifier would check that the number of jobs is at least $k$, and then, for each time block within each selected job, mark the time block as occupied. If the time block is already marked, reject the certificate. Since this would at most check every time block for every job, it is bounded from above by $mn$, and is thus polynomial in the problem size. Since the problem verifies in polynomial time, it is in NP.
+
+\subsection*{The problem is NP-hard}
+
+\subsubsection*{Mapping}
+By reduction from ISET. For an instance $a$ of ISET consisting of a graph $G = \langle V,E \rangle$, and number $k$, map to an instance $f(a)$ of $D$ by the following map $f$:
+
+\begin{itemize}
+    \item Assign unique indices to all vertices. 
+    \item Create a time block list of size $|V|^2$, and assign each vertex in $V$ to a contiguous range of blocks of size $|V|$. Each of the blocks within this range will correspond to a vertex in $V$. We will represent time slots within this list as two dimensional indices, where index $(x,y)$ refers to the $|V|x + y$th block.
+    \item For each vertex $i$, add a job $T_i$ which contains: \begin{itemize}
+        \item Each time block from $(i, 1)$ to $(i, |V|)$ 
+        \item For each vertex $j$ adjacent to $i$, the time block $(j, i)$. 
+    \end{itemize}
+\end{itemize}
+
+Creating the time block list will take time $|V|^2$, and the total number of pairs of vertices will be at most $|V|^2$, so this mapping will take $O(|V|^2)$ time.
+
+\subsubsection*{Reduction property}
+
+Consider two vertices $i$ and $j$. $T_i$ and $T_j$ will overlap if and only if $i$ and $j$ are adjacent. $T_i$'s time blocks consists of all blocks of form $(i, V)$, and $(A_i, i)$ the set $A_i$ of vertices adjacent to $i$. $T_j$'s time blocks consist of all blocks of form $(j, V)$, and $(A_j, j)$ for all vertices $A_j$ which are adjacent to $j$.
+
+The blocks of form $(A_i,i)$ and $(A_j, j)$ will never overlap and neither will the blocks of form $(i, V)$ and $(j, V)$, as $i \neq j$. That leaves only possible overlap between the blocks of form $(i, V)$ and $(A_j, j)$, or overlap between blocks of form $(j, V)$ and $(A_i, i)$. 
+
+Consider the sets of blocks $(i, V)$ and $(A_j, j)$. The first set can be further constrained to $(i, j)$, as any other block in the set would not overlap any block in $(A_j, j)$. Therefore these sets would only ovberlap if $(A_j, j)$ contains the block $(i, j)$. Since $A_j$ corresponds to the vertices adjacent to $j$, this will happen if and only if $i \in A_j$, that is, $i$ is adjacent to $j$. 
+
+Consider the sets of blocks $(j, V)$ and $(A_i, i)$. The first set can be further constrained to $(j, i)$, as any other block in the set would not overlap any block in $(A_i, i)$. Therefore these sets would only ovberlap if $(A_i, i)$ contains the block $(j, i)$. Since $A_i$ corresponds to the vertices adjacent to $i$, this will happen if and only if $j \in A_i$, that is, $j$ is adjacent to $i$. 
+
+Therefore $T_i$ and $T_j$ will overlap if and only if $i$ and $j$ are adjacent.
+
+
+\subsubsection*{Reduction, forward direction}
+Suppose we have a true instance $a$ of ISET, then the corresponding instance $f(a)$ of $D$ is true. 
+
+Since $a$ is true, there exists a set of $k$ vertices in $a$ such that none are adjacent to each other. Within $f(a)$, choose the jobs corresponding to the vertices. Since jobs will overlap if and only if their corresponding vertices are adjacent, these jobs will not overlap. Therefore there exists a set of $k$ non-overlapping jobs in $f(a)$, so $f(a)$ is a true instance.
+
+\subsubsection*{Reduction, reverse direction}
+
+Suppose we have an instance $a$ of ISET, and the corresponding instance $f(a)$ of $D$ is true. Then $a$ is a true instance of ISET.
+
+Since $f(a)$ is true, there exists a selection of $k$ jobs such that there are no overlapping time blocks. For $a$, choose the set of vertices corresponding to the selected jobs. Since two jobs $i$ and $j$ will overlap if and only if their corresponding vertices are adjacent, this set of vertices will contain no adjacent vertices, and is thus an independent set of size $k$, so $a$ is a true instance.
+
+
+Therefore, $ISET \leq_p D$, so $D$ is NP-hard. Since $D \in NP$ and $D$ is NP-hard, $D$ is NP-complete, and as such, its corresponding optimization problem is an NP-optimization problem.
+
+\pagebreak
+\section{}
+
+Call the seat assignment problem $D$.
+
+
+\subsection*{D is in NP}
+
+A certificate for $D$ would be an ordering of knights such that, for each knight, the knight to the left and right of them have gone on quests together. The certificate would be the same length as the amount of knights, so it is polynomial in the size of the problem.
+
+A verifier for a certificate would proceed as follows: For each knight in the ordering $i$, check that $(i, i+1)$ is on the list (accounting for the fact that the knight at the start of the ordering and the knight at the end of the ordering sit next to each other). Since the relation of having gone on a quest together is symmetric, we only need to check going in one direction. 
+
+The number of pairings for $n$ knights is bounded by $n^2$, so the verifier would run in time $O(n^3)$.
+
+\subsubsection*{D is NP-hard}
+(for the following problem, the fact that every vertex in a hamiltonian cycle is visited exactly once is expressed in the fact that orderings of vertices contain exactly one of every vertex)
+
+By reduction from Hamiltonian Cycle.
+
+For an instance of HAMCYCLE $a = \langle V, E \rangle$, map to an instance $f(a)$ of $D$ by the following mapping $f$:
+\begin{itemize}
+    \item For each vertex $i$ in $G$, add a knight corresponding to the vertex.
+    \item For each vertex $j$ adjacent to $i$, add the pair $(i, j)$ to the list, if it is not already there. 
+\end{itemize}
+
+In the worst case of a complete graph, there will be $|V|$ vertices and $O(|V|^2)$, the mapping takes $O(|V|^3)$ time. 
+
+\subsubsection*{Reduction, forward direction}
+Suppose we have a true instance $a$ of HAMCYCLE. Then, corresponding instance $f(a)$ of $D$ is true.
+
+Since $a$ is true, there exists an ordering of vertices such that each vertex is adjacent to the next, and the last vertex is adjacent to the first. For $f(a)$, seat the knights in the order of the corresponding vertices in the solution to $a$. Since each vertex is adjacent to the next, for each knight $i$, the pairing $(i, i+1)$ is on the list (and for the last knight, the pairing $(n, 1)$ is on the list since the last vertex is adjacent to the first). Therefore $f(a)$ is a true instance of $D$.
+
+\subsubsection*{Reduction, reverse direction}
+Suppose we have an instance $a$ of HAMCYCLE, and that the corresponding instance $f(a)$ of $D$ is true. Then, $a$ is true.
+
+Since $f(a)$ is true, there is an ordering of knights such that for each knight $i$, the pairing $(i, i+1)$ is on the list, and for the last knight, the pairing $(n, 1)$ is on the list. For $a$, choose this ordering as a hamiltonian cycle. Since each knight and the next is on the list, each vertex and the next in the cycle will be adjacent, and since the first and last knight are on the list, the first and last vertex will be adjacent. Since this is an ordering of the vertices such that each vertex is adjacent to the next, it is a Hamiltonian Cycle, and thus $a$ is true. 
+
+Since $HAMCYCLE \leq_p D$, $D$ is NP-hard. Since $D$ is also in $NP$, it is NP-complete.
+
+
+
+
+
+
+
+\end{document}
