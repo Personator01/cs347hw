@@ -1,0 +1,65 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage[bookmarks=false]{hyperref} % for URL embedding
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{8}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{8}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+The combined value of $S_m$ and $S_a$ must be at least that of the optimal solution. Suppose that the combined value was less than that of an optimal solution. The combined solution will have some value $v_c$ and weight $w_c$. Since, by definition, the weight of the combined solution is greater than $C$, the density of the combined solution will be $\frac{v_c}{w_c} < \frac{v_c}{C}$. 
+
+The optimal solution will have value $v_s$ and weight $w_s \leq C$. Since we assumed that the value of the combined solution was less than the optimal, $v_s > v_c$, so $\frac{v_c}{w_c} < \frac{v_s}{w_s}$. Therefore there exists an optimal solution with higher density than the combined solution.
+
+Since the combined solution consists of the densest $m+1$ items in the set, any denser solution will be a subset of the combined solution, as the density of a set of items is equal to the average density of each item, adding any other item would lower the density as it would be less dense than any item in the set.
+
+Therefore there exists an optimal solution which is a subset of the combined solution. Since each item has positive value, any subset of the combined solution would have a value which is at most the value of the combined solution. This contradicts our assumption that the combined value is less than the optimal solution, so the assumption must be false.
+
+Since the combined value is at least the value of an optimal solution, the larger of $S_m$ or $S_a$ has a value greater than half the optimal solution, as otherwise, both $S_m$ and $S_a$ would have values less than half the optimal solution, and then the combined solution would have value less than the optimal solution, contradicting our previously-proven property.
+
+Therefore the lower bound on the approximation is half of the optimal solution, so the algorithm is a 2-approximation.
+
+
+\end{document}
