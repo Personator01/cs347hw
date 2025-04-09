@@ -9,7 +9,6 @@
 \usepackage{amsmath}  % for extended math markup
 \usepackage{amssymb}
 \usepackage{parskip}
-\usepackage[bookmarks=false]{hyperref} % for URL embedding
 \usepackage[noend]{algpseudocode} % for pseudocode
 \usepackage[plain]{algorithm} % float environment for algorithms
 
@@ -51,15 +50,38 @@
 
 The combined value of $S_m$ and $S_a$ must be at least that of the optimal solution. Suppose that the combined value was less than that of an optimal solution. The combined solution will have some value $v_c$ and weight $w_c$. Since, by definition, the weight of the combined solution is greater than $C$, the density of the combined solution will be $\frac{v_c}{w_c} < \frac{v_c}{C}$. 
 
-The optimal solution will have value $v_s$ and weight $w_s \leq C$. Since we assumed that the value of the combined solution was less than the optimal, $v_s > v_c$, so $\frac{v_c}{w_c} < \frac{v_s}{w_s}$. Therefore there exists an optimal solution with higher density than the combined solution.
+The optimal solution will have value $v_s$ and weight $w_s \leq C$. Since we assumed that the value of the combined solution was less than the optimal, $v_s > v_c$, so $\frac{v_c}{w_c} < \frac{v_s}{w_s}$. Therefore there exists an optimal solution with density than the combined solution.
 
-Since the combined solution consists of the densest $m+1$ items in the set, any denser solution will be a subset of the combined solution, as the density of a set of items is equal to the average density of each item, adding any other item would lower the density as it would be less dense than any item in the set.
+Any solution denser than the combined $S_m$ and $S_a$ must be a subset of the combined solution.
+
+Suppose we started with $S_m \cup S_a$ and wanted to turn it into another solution (which is not a subset). This would involve removing some of the items in $S_m + S_a$ and replacing them with them with items from outside $S_m \cup S_a$. The items removed from $S_m \cup S_a$ will have some density which is greater than that of the items added to create the other solution, as $S_m \cup S_a$ consists of the densest $m+1$ items. Therefore, exchanging any elements of $S_m \cup S_a$ with elements not in $S_m \cup S_a$ will produce a less dense set.
+
+Additionally, any solution which is a superset of $S_m \cup S_a$ is not valid, as we already know that the weight of $S_m$ and $S_a$ is greater than $C$, adding items would result in another solution which is over $C$.
+
+Therefore, a valid optimal solution which is denser than $S_m \cup S_a$ must be a subset of $S_m \cup S_a$.
 
 Therefore there exists an optimal solution which is a subset of the combined solution. Since each item has positive value, any subset of the combined solution would have a value which is at most the value of the combined solution. This contradicts our assumption that the combined value is less than the optimal solution, so the assumption must be false.
 
 Since the combined value is at least the value of an optimal solution, the larger of $S_m$ or $S_a$ has a value greater than half the optimal solution, as otherwise, both $S_m$ and $S_a$ would have values less than half the optimal solution, and then the combined solution would have value less than the optimal solution, contradicting our previously-proven property.
 
 Therefore the lower bound on the approximation is half of the optimal solution, so the algorithm is a 2-approximation.
+
+\section{}
+
+
+The lower bound on the number of spools used by an optimal solution is $\ceil{\frac{\sum_i s_i}{100}}$. 
+
+Suppose an optimal solution had $\sum_i s_i = 100k$, where $k \in \mathbb{N}$, but used fewer than $\frac{\sum_i s_i}{100} = k$ spools. Then, $100k$ meters of filament would be used from fewer than $k$ 100-meter spools. This is clearly impossible, so the assumption that a solution using fewer than $k$ spools exists must be false.
+
+Suppose an optimal solution had $\sum_i s_i = 100k + j$ where $k \in \mathbb{R}$ and $0 < j < 100$, and that the solution uses fewer than $\ceil{\frac{\sum_i s_i}{100}} = \ceil{k + \frac{j}{100}} = k+1$. Then $100k + j$ meters of filament would be used from at most $k$ 100-meter spools. This is clearly impossible, so the assumption that a solution using fewer than $k+1$ spools exists must be false.
+
+The upper bound on the number of spools used by a greedy solution is $\frac{5}{4}\ceil{\frac{\sum_i s_i}{100}}$. 
+
+Suppose $\sum_i s_i = 100k$, where $k \in \mathbb{N}$. The optimal solution will use at least $k$ spools. Since the greedy solution will use a single spool until the next item does not fit, and the maximum size of an item is one fifth of the spool length, the greedy method will use at least 80 meters of filament per spool, and thus will reduce the remaining filament needed to print the items by at least 80 meters. Therefore the upper bound on the number of spools needed is expressed in the equation $100k - 80m = 0$, or $m = \frac{100k}{80}$. Therefore the approximation ratio in this case is $\frac{\frac{100}{80}k}{k} = \frac{5}{4}$. 
+
+Suppose $\sum_i s_i = 100k +j$, where $k \in \mathbb{N}$ and $0 < j < 100$. The optimal solution will use at least $k+1$ spools. Once again, the greedy solution will eliminate at least 80 remaining meters of filament per spool, so the upper bound is expressed in the equation $100k + j - 80m = 0$, or $m = \frac{100k + j}{80}$. Therefore the approximation ratio in theis case is $\frac{\frac{100k}{80} + \frac{j}{80}}{k} = \frac{5}{4} + \frac{j}{80k}$. Since $j < 100$, this extra term has value at most $\frac{5}{4k}$, and approaches zero as $k$ increases.
+
+Since the worst case approximation ratio is $\frac{5}{4}$ plus a small constant, this is a 5/4-approximation (plus a small constant for small $k$).
 
 
 \end{document}
