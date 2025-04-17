@@ -1,0 +1,132 @@
+%
+% CSE Electronic Homework Template
+% Last modified 8/20/2019 by Jeremy Buhler
+
+\documentclass[11pt]{article}
+\usepackage[left=0.7in,right=0.7in,top=1in,bottom=0.7in]{geometry}
+\usepackage{fancyhdr} % for header
+\usepackage{graphicx} % for figures
+\usepackage{amsmath}  % for extended math markup
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage[noend]{algpseudocode} % for pseudocode
+\usepackage[plain]{algorithm} % float environment for algorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STUDENT: modify the following fields to reflect your the current
+% homework number.  Do NOT include a name or ID or other personally
+% identifying info, as we will use anonymized grading in GradeScope.
+
+\newcommand{\HomeworkNumber}{9}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can pretty much leave the stuff up to the next line of %%'s alone.
+
+% create header and footer for every page
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textbf{Hwk \HomeworkNumber{}}}
+\cfoot{\thepage}
+
+% preferred pseudocode style
+\algrenewcommand{\algorithmicprocedure}{}
+\algrenewcommand{\algorithmicthen}{}
+
+% ``do { ... } while (cond)''
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+% ``for (x in y ... z)''
+\newcommand{\ForRange}[3]{\For{#1 \textbf{in} #2 \ \ldots \ #3}}
+
+% these are common math formatting commands that aren't defined by default
+\newcommand{\union}{\cup}
+\newcommand{\isect}{\cap}
+\newcommand{\ceil}[1]{\ensuremath \left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\ensuremath \left\lfloor #1 \right\rfloor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% STUDENT: Your text goes here!
+\section{}
+\subsection*{a.}
+For each edge, there are $3^2 = 9$ ways to assign two colors, and 3 of these assignments result in the same color, so the probability that any one edge satisfies is $1/3$. Define $S_e$ to be $1$ if edge $e \in E$ satisfies, and $0$ otherwise. Then, the expected number of satisfying edges, 
+
+\begin{align*}
+    E\left[ \sum_{e \in E} S_e\right] &= \sum_{e \in E} E[S_e]  \\
+    &= \sum_{e\in E} \frac{2}{3}  \\
+    &= \frac{2}{3}|E|
+\end{align*}
+
+\subsection*{b.}
+Suppose a graph has fewer than $2/3|E|$ of its edges satisfying. Then, more than one third of the edges are between vertices of the same color.
+
+There must exist some vertex with fewer than 2/3 of its edges satisfying. Suppose this were false, that all vertices had at least 2/3 of their edges satisfying. Then the graph as a whole would have at least 2/3 of its edges satisfying, contradicting our assumption. 
+
+Consider such a vertex, and suppose the vertex has $d$ edges. Since fewer than $2/3d$ of its edges are satisfying, more than $1/3d$ of its edges go to the same color, which we will call $c_1$. The rest of the edges go to $c_2$ or $c_3$.
+
+Since fewer than $2/3d$ edges go to $c_2$ and $c_3$, fewer than $1/3d$ edges go to at least one of $c_2$ or $c_3$, as otherwise the number of edges to $c_2$ and $c_3$ would be at least $2/3d$. Suppose then, without loss of generality, that fewer than $1/3d$ edges go to vertices of color $c_2$. Now change the vertex's color to $c_2$. This will make all $c_1$ edges satisfying, while making all $c_2$ edges non-satisfying. Since we showed that there are more than $1/3d$ $c_1$ edges and less than $1/3d$ $c_2$ edges, this color change is guaranteed to increase the number of satisfying edges.
+
+Therefore if the graph coloring has fewer than $2/3|E|$ satisfying edges, there is a guaranteed way to increase the number of satisfying edges. We can repeatedly apply this operation until there are $2/3|E|$ satisfying edges, so a graph with such a coloring must exist.
+
+\subsection{c.}
+
+Let $S$ be the random variable defined as $S = \frac{1}{|E|} \sum_{e \in E} S_e$. As shown previously, $E[S] = \frac{2}{3}$.
+
+Let $\overline{S}$ be the random variable defined as the number of non-satisfying edges. Then, $E[\overline{S}] = \frac{1}{3}$.
+
+Then, apply Markov's Inequality: $Pr( \overline{S} \geq \frac{1}{2} ) \leq \frac{1/3}{1/2}$, so $Pr ( \overline{S} \geq \frac{1}{2} ) \leq \frac{2}{3}$. Therefore the probability that more than half of the edges are non-satisfying, and thus, that fewer than half of the edges are satisfying, is at most $\frac{2}{3}$. Then, the probability that more than half of the edges are satisfying must be at least $1 - \frac{2}{3}$, so $p = \frac{1}{3}$.
+
+Now, consider the process of repeatedly generating a random assignment until one is found which satisfies at least half of the edges. Each generation can be described as a Bernoulli trial with $p = \frac{1}{3}$. Then, the number of generations $N$ before a satisfying assignment is found can be modeled as a negative binomial distribution with $r = 1$ and $p = \frac{1}{3}$, that is, $N \sim NB(1, \frac{1}{3})$. 
+
+Then, for target probability $1 - \epsilon$, we must find the number of generations $n$ such that the probability that we find a satisfying assignment within $n$ generations is at least $1 - \epsilon$. This is equivalent to finding $n$ such that $Pr(N \leq n) \geq 1 - \epsilon$, or expressed as the cumulative distribution function of $N$, $n$ such that $F_N(n) \geq 1 - \epsilon$. 
+
+For a negative binomial distribution, $NB(1, \frac{1}{3})$, $F(n) = I_{\frac{1}{3}}(1, n+1)$, where $I$ is the regularized incomplete beta function. $I_x(1, n) = 1 - (1-x)^n$, so $F(n) = 1 - (1 - \frac{1}{3})^{n+1}$. Therefore, we need to find $n$ such that $1 - (\frac{2}{3})^{n+1} = \epsilon$, or more simply, $(\frac{2}{3})^{n-1} = \epsilon$. Then, $n-1 = \log_{2/3} \epsilon = \frac{\log \epsilon}{\log \frac{2}{3}}$, so $n = \frac{\log \epsilon}{\log \frac{2}{3}} + 1$. 
+
+Then, our algorithm can proceed as such:
+\begin{enumerate}
+    \item Calculate $n$ as above. 
+    \item For 1...n:
+        \begin{itemize}
+            \item Randomly generate an assignment of colors.
+            \item If the assignment has at least half of its edges satisfying, return it.
+        \end{itemize}
+    \item Return the final generated assignment.
+\end{enumerate}
+
+Since we know that the probability of finding an assignment with at least half of its edges satisfying after $n$ trials is $1 - \epsilon$, this algorithm will find a half-satisfying assignment with probability $1 - \epsilon$. 
+
+Information on the beta function is taken from \texttt{https://en.wikipedia.org/wiki/Beta\_function}.
+
+
+\section{}
+\subsection*{a.}
+
+Consider a list $L$ whose elements are in strictly ascending order, such that for all $e_i \in L$, $e_{i-1} < e_i$ if it exists. Then, $(m_1, m_2)$ will be set to $(e_2, e_1)$. 
+
+Now, suppose we are currently on element $e_i$, and we have $(m_1, m_2) = (e_{i-1}, e_{i-2})$. Then, $e_i$ will be compared against $m_2$, and since $e_i > e_{i-2}$, $e_i$ will be compared against $m_1$, and since 
+$e_3 > e_{i-1}$, $(m_1, m_2)$ will be assigned the values $(e_i, e_{i-1})$. Then, the next item to process is $e_{i+1}$, with $(m_1, m_2) = (e_i, e_{i-1})$, that is, the same as we had originally, with $i$ incremented by one. Since we start at $e_3$, with $(m_1, m_2) = (e_2, e_1)$, it follows then by induction that the same sequence of comparisons and assignments will happen for each $e_i \in e_3...e_n$, and therefore, since there are two comparisons for each item, there will be $2(n-2) = 2n - O(1)$ comparisons for $MAX2(L)$. 
+
+\subsection{b.}
+
+Since the first comparison happens unconditionally for all elements past the second, plus an additional comparison between the first and second elements, there is a minimum of $n-1$ comparisons made. We must find the expected value of the number of second comparisons made.
+
+Suppose we are on element $e_i$ in a randomly-permuted list. Then, the second comparison will happen if and only if $e_i \geq m_2$. Then, since $m_1$ and $m_2$ are the first and second largest elements in the range $e_1$ to $e_{i-1}$, the probability that $m_2$ is greater than $e_i$ is the probability that there exists two elements larger than $e_i$ within that range. 
+
+Supposing that $e_i$ has rank $r$, the probability that two elements before $e_i$ have rank greater than $r$ is equal to the probability that all but one of the elements before $e_i$ have rank less than $r$. This is expressed as $(r/n)^{i-1}$. Since we assumed the list to be randomly assigned, $r$ will be described by a discrete uniform distribution on the range $(0, n-1)$. Define $S_i = 1$ if $e_i$ causes a second comparison and $0$ otherwise. 
+Supposing that $e_i$ has rank $r$, the probability that there exist two elements before $e_i$ with rank greater than $r$ is the probability that $e_i$ is has either the highest or second highest rank among all elements $e_1$ through $e_i$. This probability, assuming that the elements are randomly, is $\frac{2}{i}$. Define $S_i = 1$ if $e_i$ causes a second comparison and $0$ otherwise. Then $E[S_i] = \frac{2}{i}$.
+
+Let $S$ be the total number of second comparisons made. $E[S] = \sum_{i=3}^{n} E[S_i] = \sum_{i=3}^{n} \frac{2}{i}$. This is a fragment of the harmonic series, specifically, $2(H_n) - H_1 - H_2$. Since $H_n$ is $\Theta(\log n)$, after removing extraneous constants, $E[S] \in \Theta(2(H_n) - H-1 - H-2) = \Theta(H_n) = \Theta(\log n) \in O(\log n)$.
+
+Therefore, in expectation, the number of comparisons made over the course of the algorithm is $n + O(\log n)$.
+
+
+
+
+
+\begin{align*}
+\end{align*}
+
+
+\end{document}
